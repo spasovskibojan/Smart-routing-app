@@ -8,7 +8,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { ProtectedRoute } from "./components/Auth/ProtectedRoute.jsx";
 import { AuthProvider } from "./components/Auth/AuthContext.jsx";
 import { PublicRoute } from "./components/Auth/PublicRoute.jsx";
-import Login from "./components/Auth/login.jsx";
+import Login from "./components/Auth/Login.jsx";
 
 createRoot(document.getElementById("root")).render(
   <AuthProvider>
