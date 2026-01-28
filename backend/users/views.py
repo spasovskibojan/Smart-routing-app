@@ -21,7 +21,6 @@ from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
 #             return Response({ 'error': 'CheckAuthenticatedView went wrong...' })
 
 
-@method_decorator(csrf_protect, name='dispatch')
 class RegisterView(APIView):
     permission_classes = (permissions.AllowAny, )
 
@@ -46,7 +45,6 @@ class RegisterView(APIView):
             return Response({ 'error': 'RegisterView went wrong...' })
 
 
-@method_decorator(csrf_protect, name='dispatch')
 class LoginView(APIView):
     permission_classes = (permissions.AllowAny, )
 
