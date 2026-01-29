@@ -8,9 +8,14 @@ const Login = () => {
   const navigate = useNavigate();
   const { setUser } = useAuth();
   const [form, setForm] = useState({ username: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handlePasswordToggle = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -59,7 +64,7 @@ const Login = () => {
           </div>
           <div className="form-floating mb-2">
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               className="form-control"
               id="password"
               name="password"
@@ -75,6 +80,8 @@ const Login = () => {
               className="form-check-input"
               type="checkbox"
               id="passwordToggle"
+              checked={showPassword}
+              onChange={handlePasswordToggle}
             />
             <label className="form-check-label" htmlFor="passwordToggle">
               Show password

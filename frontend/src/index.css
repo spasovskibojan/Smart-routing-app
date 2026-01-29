@@ -11,3 +11,57 @@
   width: 12px;
   height: 12px;
 }
+
+/* Mobile responsive sidebar styles */
+@media (max-width: 991.98px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  
+  .sidebar.mobile-open {
+    transform: translateX(0) !important;
+  }
+  
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+  
+  /* Adjust map to take full width on mobile */
+  .map-container {
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+}
+
+@media (min-width: 992px) {
+  .sidebar {
+    position: relative !important;
+    transform: none !important;
+  }
+  
+  .mobile-menu-btn {
+    display: none !important;
+  }
+  
+  .sidebar-overlay {
+    display: none !important;
+  }
+}
+
+/* Smooth scrollbar for sidebar */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}

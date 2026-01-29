@@ -14,6 +14,7 @@ function Sidebar(props) {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLoadRoute = (route) => {
     props.setMarkers(route.markers);
@@ -27,6 +28,10 @@ function Sidebar(props) {
     await logout();
     setUser(null);
     navigate("/login");
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   const searchLocation = async (query) => {
@@ -85,181 +90,272 @@ function Sidebar(props) {
     }
   };
 
+  // Hamburger menu icon styles
+  const hamburgerStyles = {
+    button: {
+      position: 'fixed',
+      top: '10px',
+      left: '10px',
+      zIndex: 1100,
+      width: '50px',
+      height: '50px',
+      borderRadius: '50%',
+      backgroundColor: '#0d6efd',
+      border: 'none',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+    },
+    bar: {
+      width: '24px',
+      height: '3px',
+      backgroundColor: 'white',
+      borderRadius: '2px',
+      transition: 'all 0.3s ease',
+    }
+  };
+
   return (
-    <div
-      className="d-flex flex-column p-3 bg-light border-end shadow-sm"
-      style={{ width: "380px", overflowY: "auto" }}
-    >
-      <div className="user-header d-flex align-items-center justify-content-between mb-3 p-3 bg-white rounded shadow-sm border">
-        <div className="user-info d-flex align-items-center">
-          <div
-            className="user-avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
-            style={{
-              width: "40px",
-              height: "40px",
-              fontSize: "16px",
-              fontWeight: "bold",
-            }}
-          >
-            {user ? user.charAt(0).toUpperCase() : "U"}
-          </div>
-          <div>
-            <div className="fw-semibold text-dark" style={{ fontSize: "14px" }}>
-              {user || "Unknown User"}
-            </div>
-            <div className="text-muted small">Online</div>
-          </div>
-        </div>
-        <button
-          onClick={handleLogout}
-          className="btn btn-outline-danger btn-sm d-flex align-items-center"
-          style={{ fontSize: "12px", padding: "4px 8px" }}
-          title="Logout"
-        >
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="me-1"
-          >
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-            <polyline points="16,17 21,12 16,7" />
-            <line x1="21" y1="12" x2="9" y2="12" />
+    <>
+      {/* Mobile Hamburger Button */}
+      <button
+        className="mobile-menu-btn d-lg-none"
+        onClick={toggleMobileMenu}
+        style={hamburgerStyles.button}
+        aria-label="Toggle menu"
+      >
+        {isMobileMenuOpen ? (
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
-          Logout
-        </button>
-      </div>
+        ) : (
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        )}
+      </button>
 
-      <div className="location-search mb-3">
-        <form onSubmit={handleSearchSubmit} className="position-relative">
-          <div className="input-group">
-            <span className="input-group-text bg-white border-end-0">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.35-4.35" />
-              </svg>
-            </span>
-            <input
-              type="text"
-              className="form-control border-start-0"
-              placeholder="Search for a location..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-              onFocus={() => searchResults.length > 0 && setShowDropdown(true)}
-              onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-            />
-            {isSearching && (
-              <span className="input-group-text bg-white border-start-0">
-                <div
-                  className="spinner-border spinner-border-sm text-primary"
-                  role="status"
-                >
-                  <span className="visually-hidden">Loading...</span>
-                </div>
-              </span>
-            )}
-          </div>
+      {/* Overlay for mobile */}
+      {isMobileMenuOpen && (
+        <div
+          className="sidebar-overlay d-lg-none"
+          onClick={toggleMobileMenu}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            zIndex: 1000,
+          }}
+        />
+      )}
 
-          {showDropdown && searchResults.length > 0 && (
+      {/* Sidebar */}
+      <div
+        className={`sidebar d-flex flex-column p-3 bg-light border-end shadow-sm ${isMobileMenuOpen ? 'mobile-open' : ''}`}
+        style={{
+          width: '380px',
+          maxWidth: '100vw',
+          overflowY: 'auto',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          height: '100vh',
+          zIndex: 1050,
+          transform: isMobileMenuOpen ? 'translateX(0)' : undefined,
+          transition: 'transform 0.3s ease-in-out',
+        }}
+      >
+        {/* Close button for mobile (inside sidebar) */}
+        <div className="d-lg-none text-end mb-2">
+          <button
+            className="btn btn-link text-dark p-0"
+            onClick={toggleMobileMenu}
+            style={{ fontSize: '24px' }}
+          >
+            &times;
+          </button>
+        </div>
+
+        <div className="user-header d-flex align-items-center justify-content-between mb-3 p-3 bg-white rounded shadow-sm border">
+          <div className="user-info d-flex align-items-center">
             <div
-              className="dropdown-menu show w-100 mt-1 shadow-lg border-0"
-              style={{ maxHeight: "200px", overflowY: "auto" }}
+              className="user-avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+              style={{
+                width: "40px",
+                height: "40px",
+                fontSize: "16px",
+                fontWeight: "bold",
+              }}
             >
-              {searchResults.map((result, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  className="dropdown-item d-flex align-items-start p-3 border-0"
-                  onClick={() => handleLocationSelect(result)}
-                  style={{ whiteSpace: "normal", lineHeight: "1.4" }}
-                >
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="me-2 mt-1 flex-shrink-0 text-primary"
-                  >
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                    <circle cx="12" cy="10" r="3" />
-                  </svg>
-                  <div>
-                    <div
-                      className="fw-medium text-dark"
-                      style={{ fontSize: "13px" }}
-                    >
-                      {result.components.road ||
-                        result.components.neighbourhood ||
-                        result.components.city ||
-                        "Unknown"}
-                    </div>
-                    <div className="text-muted small">{result.formatted}</div>
-                  </div>
-                </button>
-              ))}
+              {user ? user.charAt(0).toUpperCase() : "U"}
             </div>
-          )}
-        </form>
-      </div>
+            <div>
+              <div className="fw-semibold text-dark" style={{ fontSize: "14px" }}>
+                {user || "Unknown User"}
+              </div>
+              <div className="text-muted small">Online</div>
+            </div>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="btn btn-outline-danger btn-sm d-flex align-items-center"
+            style={{ fontSize: "12px", padding: "4px 8px" }}
+            title="Logout"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="me-1"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16,17 21,12 16,7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            Logout
+          </button>
+        </div>
 
-      <h2 className="text-center mb-3">Smart Routing App</h2>
-      <p className="text-center text-muted small mb-3">
-        Кликнете на мапата за да додадете локации (маркери).
-      </p>
+        <div className="location-search mb-3">
+          <form onSubmit={handleSearchSubmit} className="position-relative">
+            <div className="input-group">
+              <span className="input-group-text bg-white border-end-0">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.35-4.35" />
+                </svg>
+              </span>
+              <input
+                type="text"
+                className="form-control border-start-0"
+                placeholder="Search for a location..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onFocus={() => searchResults.length > 0 && setShowDropdown(true)}
+                onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+              />
+              {isSearching && (
+                <span className="input-group-text bg-white border-start-0">
+                  <div
+                    className="spinner-border spinner-border-sm text-primary"
+                    role="status"
+                  >
+                    <span className="visually-hidden">Loading...</span>
+                  </div>
+                </span>
+              )}
+            </div>
 
-      <Controls
-        markers={props.markers}
-        setMarkers={props.setMarkers}
-        routeType={props.routeType}
-        setRouteType={props.setRouteType}
-        transportation={props.transportation}
-        setTransportation={props.setTransportation}
-        handleOptimizeRoute={props.handleOptimizeRoute}
-        handleClear={props.handleClear}
-      />
+            {showDropdown && searchResults.length > 0 && (
+              <div
+                className="dropdown-menu show w-100 mt-1 shadow-lg border-0"
+                style={{ maxHeight: "200px", overflowY: "auto" }}
+              >
+                {searchResults.map((result, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    className="dropdown-item d-flex align-items-start p-3 border-0"
+                    onClick={() => handleLocationSelect(result)}
+                    style={{ whiteSpace: "normal", lineHeight: "1.4" }}
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="me-2 mt-1 flex-shrink-0 text-primary"
+                    >
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                      <circle cx="12" cy="10" r="3" />
+                    </svg>
+                    <div>
+                      <div
+                        className="fw-medium text-dark"
+                        style={{ fontSize: "13px" }}
+                      >
+                        {result.components.road ||
+                          result.components.neighbourhood ||
+                          result.components.city ||
+                          "Unknown"}
+                      </div>
+                      <div className="text-muted small">{result.formatted}</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </form>
+        </div>
 
-      <div className="mt-4">
-        <h5>Зачувани рути:</h5>
-        <SavedRoutesList onLoadRoute={handleLoadRoute} />
-      </div>
+        <h2 className="text-center mb-3">Smart Routing App</h2>
+        <p className="text-center text-muted small mb-3">
+          Кликнете на мапата за да додадете локации (маркери).
+        </p>
 
-      <div className="mt-4">
-        <h5>Додадени локации:</h5>
-        <MarkersList
+        <Controls
           markers={props.markers}
-          onDeleteMarker={props.handleDeleteMarker}
+          setMarkers={props.setMarkers}
+          routeType={props.routeType}
+          setRouteType={props.setRouteType}
+          transportation={props.transportation}
+          setTransportation={props.setTransportation}
+          handleOptimizeRoute={props.handleOptimizeRoute}
+          handleClear={props.handleClear}
         />
-      </div>
 
-      <div className="mt-3 flex-grow-1">
-        <h5>Насоки:</h5>
-        <DirectionsList
-          routeSteps={props.routeSteps}
-          visibleSteps={props.visibleSteps}
-          activeIndex={props.activeIndex}
-          onStepClick={props.handleStepClick}
-          onShowMore={props.handleShowMore}
-        />
+        <div className="mt-4">
+          <h5>Зачувани рути:</h5>
+          <SavedRoutesList onLoadRoute={handleLoadRoute} />
+        </div>
+
+        <div className="mt-4">
+          <h5>Додадени локации:</h5>
+          <MarkersList
+            markers={props.markers}
+            onDeleteMarker={props.handleDeleteMarker}
+          />
+        </div>
+
+        <div className="mt-3 flex-grow-1">
+          <h5>Насоки:</h5>
+          <DirectionsList
+            routeSteps={props.routeSteps}
+            visibleSteps={props.visibleSteps}
+            activeIndex={props.activeIndex}
+            onStepClick={props.handleStepClick}
+            onShowMore={props.handleShowMore}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
