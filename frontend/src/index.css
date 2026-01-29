@@ -17,15 +17,28 @@
   .sidebar {
     transform: translateX(-100%);
   }
-  
+
+  /* Move Leaflet zoom controls to right side on mobile */
+  .leaflet-control-zoom {
+    position: absolute !important;
+    right: 10px !important;
+    left: auto !important;
+    top: 80px !important;
+  }
+
+  .leaflet-top.leaflet-left {
+    left: auto !important;
+    right: 0 !important;
+  }
+
   .sidebar.mobile-open {
     transform: translateX(0) !important;
   }
-  
+
   .mobile-menu-btn {
     display: flex !important;
   }
-  
+
   /* Adjust map to take full width on mobile */
   .map-container {
     width: 100% !important;
@@ -38,11 +51,11 @@
     position: relative !important;
     transform: none !important;
   }
-  
+
   .mobile-menu-btn {
     display: none !important;
   }
-  
+
   .sidebar-overlay {
     display: none !important;
   }
