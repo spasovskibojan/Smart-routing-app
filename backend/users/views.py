@@ -56,11 +56,11 @@ class LoginView(APIView):
             if user is None:
                 return Response({"error": "Invalid credentials"}, status=400)
 
-            request.session.flush()
             login(request, user)
+            request.session.save()  # Explicitly save session for cross-origin cookies
             return Response({"detail": "Logged in", "username": user.username})
-        except:
-            return Response({ 'error': 'LoginView went wrong...' })
+        except Exception as e:
+            return Response({ 'error': f'LoginView error: {str(e)}' }, status=500)
 
 
 class MeView(APIView):

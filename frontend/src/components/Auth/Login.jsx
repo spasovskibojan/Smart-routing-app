@@ -14,14 +14,30 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await login(form.username, form.password);
-    if (res.ok) {
-      const userResponse = await me();
-      const userData = await userResponse.json();
-      setUser(userData.username);
-      navigate("/");
-    } else {
-      alert("Login failed");
+    try {
+      const res = await login(form.username, form.password);
+      console.log('Login response:', res.status, res.ok);
+
+      if (res.ok) {
+        const userResponse = await me();
+        console.log('Me response:', userResponse.status, userResponse.ok);
+
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          setUser(userData.username);
+          navigate("/");
+        } else {
+          console.error('Failed to get user data after login');
+          alert("Login failed: Could not verify session. Please try again.");
+        }
+      } else {
+        const errorData = await res.json();
+        console.error('Login failed:', errorData);
+        alert(`Login failed: ${errorData.error || 'Invalid credentials'}`);
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert("Login failed: " + error.message);
     }
   };
 
