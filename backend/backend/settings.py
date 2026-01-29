@@ -163,5 +163,10 @@ CORS_ALLOW_CREDENTIALS = True
 SESSION_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
+# Set cookie domain to backend domain for cross-origin requests
+SESSION_COOKIE_DOMAIN = os.getenv('SESSION_COOKIE_DOMAIN', None)  
+SESSION_COOKIE_NAME = 'sessionid' 
+SESSION_COOKIE_AGE = 1209600  # 2 weeks
+SESSION_COOKIE_PATH = '/'  # Ensure cookie is sent with all requests
 CSRF_COOKIE_SAMESITE = 'None'
 CSRF_COOKIE_SECURE = True
