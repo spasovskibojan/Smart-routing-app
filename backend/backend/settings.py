@@ -147,7 +147,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated'
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication'
+        'users.authentication.CsrfExemptSessionAuthentication'  # Custom auth without CSRF
     ]
 }
 # CSRF and CORS settings for development and production
