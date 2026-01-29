@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
@@ -16,6 +16,8 @@ load_dotenv()
 
 ORS_API_KEY = os.getenv("ORS_API_KEY")
 
+
+@csrf_exempt
 def find_optimal_route(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Invalid method. Use POST.'}, status=405)
@@ -159,6 +161,144 @@ def fetch_route_response(ordered_points, profile, headers):
     })
 
 
+# DRF-based views for saved routes - these use JWT authentication
+class SavedRoutesListCreateView(APIView):
+    """
+    List all saved routes for the authenticated user, or create a new route.
+    Uses JWT authentication via DRF's DEFAULT_AUTHENTICATION_CLASSES.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        print(f"SavedRoutesListCreateView GET - User: {request.user}, Authenticated: {request.user.is_authenticated}")
+        
+        routes = SavedRoute.objects.filter(user=request.user)
+        data = [{
+            'id': route.id,
+            'name': route.name,
+            'markers': route.markers,
+            'route_type': route.route_type,
+            'transportation': route.transportation,
+            'markers_count': route.get_markers_count(),
+            'created_at': route.created_at.isoformat(),
+            'updated_at': route.updated_at.isoformat()
+        } for route in routes]
+        return Response(data)
+
+    def post(self, request):
+        print(f"SavedRoutesListCreateView POST - User: {request.user}, Authenticated: {request.user.is_authenticated}")
+        
+        data = request.data
+        name = data.get('name', '').strip()
+        markers = data.get('markers', [])
+        route_type = data.get('route_type', 'round_trip')
+        transportation = data.get('transportation', 'driving-car')
+
+        if not name:
+            return Response({'error': 'Route name is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if len(markers) < 2:
+            return Response({'error': 'At least 2 markers required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if SavedRoute.objects.filter(user=request.user, name=name).exists():
+            return Response({'error': 'Route with this name already exists'}, status=status.HTTP_400_BAD_REQUEST)
+
+        route = SavedRoute.objects.create(
+            user=request.user,
+            name=name,
+            markers=markers,
+            route_type=route_type,
+            transportation=transportation
+        )
+
+        return Response({
+            'id': route.id,
+            'name': route.name,
+            'markers': route.markers,
+            'route_type': route.route_type,
+            'transportation': route.transportation,
+            'markers_count': route.get_markers_count(),
+            'created_at': route.created_at.isoformat(),
+            'updated_at': route.updated_at.isoformat()
+        }, status=status.HTTP_201_CREATED)
+
+
+class SavedRouteDetailView(APIView):
+    """
+    Retrieve, update or delete a saved route.
+    Uses JWT authentication via DRF's DEFAULT_AUTHENTICATION_CLASSES.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, pk, user):
+        try:
+            return SavedRoute.objects.get(pk=pk, user=user)
+        except SavedRoute.DoesNotExist:
+            return None
+
+    def get(self, request, pk):
+        route = self.get_object(pk, request.user)
+        if route is None:
+            return Response({'error': 'Route not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({
+            'id': route.id,
+            'name': route.name,
+            'markers': route.markers,
+            'route_type': route.route_type,
+            'transportation': route.transportation,
+            'markers_count': route.get_markers_count(),
+            'created_at': route.created_at.isoformat(),
+            'updated_at': route.updated_at.isoformat()
+        })
+
+    def put(self, request, pk):
+        route = self.get_object(pk, request.user)
+        if route is None:
+            return Response({'error': 'Route not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        data = request.data
+        name = data.get('name', '').strip()
+        markers = data.get('markers', route.markers)
+        route_type = data.get('route_type', route.route_type)
+        transportation = data.get('transportation', route.transportation)
+
+        if not name:
+            return Response({'error': 'Route name is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if len(markers) < 2:
+            return Response({'error': 'At least 2 markers required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if name != route.name and SavedRoute.objects.filter(user=request.user, name=name).exists():
+            return Response({'error': 'Route with this name already exists'}, status=status.HTTP_400_BAD_REQUEST)
+
+        route.name = name
+        route.markers = markers
+        route.route_type = route_type
+        route.transportation = transportation
+        route.save()
+
+        return Response({
+            'id': route.id,
+            'name': route.name,
+            'markers': route.markers,
+            'route_type': route.route_type,
+            'transportation': route.transportation,
+            'markers_count': route.get_markers_count(),
+            'created_at': route.created_at.isoformat(),
+            'updated_at': route.updated_at.isoformat()
+        })
+
+    def delete(self, request, pk):
+        route = self.get_object(pk, request.user)
+        if route is None:
+            return Response({'error': 'Route not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        route.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# Keep the old function views as legacy (but they won't be used)
 @csrf_exempt
 def saved_routes_list_create(request):
     print(request)
