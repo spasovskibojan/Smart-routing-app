@@ -94,7 +94,7 @@ function Sidebar(props) {
   const hamburgerStyles = {
     button: {
       position: 'fixed',
-      top: '80px',
+      top: '10px',
       left: '10px',
       zIndex: 1100,
       width: '50px',
