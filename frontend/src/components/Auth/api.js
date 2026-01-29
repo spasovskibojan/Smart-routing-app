@@ -1,71 +1,120 @@
 import API_BASE_URL from '../../config';
 
-export async function fetchCSRF() {
-  await fetch(`${API_BASE_URL}/users/csrf_cookie`, {
-    credentials: "include",
-  });
-}
-export function getCookie(name) {
-  console.log(document.cookie);
-
-  const cookieValue = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith(name + "="));
-  console.log(cookieValue?.split("=")[1]);
-
-  return cookieValue?.split("=")[1];
+// Token storage utilities
+export function getAccessToken() {
+  return localStorage.getItem('access_token');
 }
 
-// export function getCookie(name) {
-//   const matches = document.cookie.match(
-//     new RegExp("(^| )" + name + "=([^;]+)")
-//   );
-//   console.log(matches);
+export function getRefreshToken() {
+  return localStorage.getItem('refresh_token');
+}
 
-//   return matches ? matches[2] : null;
-// }
+export function setTokens(access, refresh) {
+  localStorage.setItem('access_token', access);
+  if (refresh) {
+    localStorage.setItem('refresh_token', refresh);
+  }
+}
 
+export function clearTokens() {
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('refresh_token');
+}
+
+// Helper function to get auth headers
+export function authHeaders() {
+  const token = getAccessToken();
+  if (token) {
+    return {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    };
+  }
+  return { 'Content-Type': 'application/json' };
+}
+
+// Refresh access token if expired
+export async function refreshAccessToken() {
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) return false;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/users/refresh`, {
+      method: "POST",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh: refreshToken }),
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      setTokens(data.access, null);
+      return true;
+    }
+  } catch (error) {
+    console.error('Token refresh failed:', error);
+  }
+
+  clearTokens();
+  return false;
+}
+
+// API functions
 export async function register(username, password, password2) {
-  await fetchCSRF();
   const res = await fetch(`${API_BASE_URL}/users/register`, {
     method: "POST",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      "X-CSRFToken": getCookie("csrftoken"),
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username, password, password2 }),
   });
   return res;
 }
 
 export async function login(username, password) {
-  await fetchCSRF();
   const res = await fetch(`${API_BASE_URL}/users/login`, {
     method: "POST",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      "X-CSRFToken": getCookie("csrftoken"),
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username, password }),
   });
+
+  if (res.ok) {
+    const data = await res.json();
+    setTokens(data.access, data.refresh);
+    return { ok: true, data };
+  }
+
   return res;
 }
 
 export async function me() {
-  return await fetch(`${API_BASE_URL}/users/me`, {
-    credentials: "include",
+  const res = await fetch(`${API_BASE_URL}/users/me`, {
+    headers: authHeaders(),
   });
+
+  // If unauthorized, try to refresh token
+  if (res.status === 401) {
+    const refreshed = await refreshAccessToken();
+    if (refreshed) {
+      return await fetch(`${API_BASE_URL}/users/me`, {
+        headers: authHeaders(),
+      });
+    }
+  }
+
+  return res;
 }
 
 export async function logout() {
-  await fetch(`${API_BASE_URL}/users/logout`, {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      "X-CSRFToken": getCookie("csrftoken"),
-      "Content-Type": "application/json",
-    },
-  });
+  // JWT is stateless - just clear local tokens
+  clearTokens();
+
+  // Optional: notify backend
+  try {
+    await fetch(`${API_BASE_URL}/users/logout`, {
+      method: "POST",
+      headers: authHeaders(),
+    });
+  } catch (error) {
+    // Ignore - tokens already cleared locally
+  }
+
+  return { ok: true };
 }

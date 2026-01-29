@@ -147,26 +147,20 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated'
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'users.authentication.CsrfExemptSessionAuthentication'  # Custom auth without CSRF
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ]
 }
-# CSRF and CORS settings for development and production
-CSRF_TRUSTED_ORIGINS_ENV = os.getenv('CSRF_TRUSTED_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173')
-CSRF_TRUSTED_ORIGINS = CSRF_TRUSTED_ORIGINS_ENV.split(',')
 
+# JWT Token settings
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+# CORS settings for cross-origin requests
 CORS_ALLOWED_ORIGINS_ENV = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173')
 CORS_ALLOWED_ORIGINS = CORS_ALLOWED_ORIGINS_ENV.split(',')
-
 CORS_ALLOW_CREDENTIALS = True
-
-# Session cookie settings for cross-origin requests
-SESSION_COOKIE_SAMESITE = 'None'
-SESSION_COOKIE_SECURE = True
-SESSION_COOKIE_HTTPONLY = True
-# Set cookie domain to backend domain for cross-origin requests
-SESSION_COOKIE_DOMAIN = os.getenv('SESSION_COOKIE_DOMAIN', None)  
-SESSION_COOKIE_NAME = 'sessionid' 
-SESSION_COOKIE_AGE = 1209600  # 2 weeks
-SESSION_COOKIE_PATH = '/'  # Ensure cookie is sent with all requests
-CSRF_COOKIE_SAMESITE = 'None'
-CSRF_COOKIE_SECURE = True

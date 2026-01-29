@@ -3,6 +3,7 @@ import Sidebar from "./components/Sidebar/Sidebar";
 import MapView from "./components/Map/MapView";
 import { SavedRoutesProvider } from "./components/Routes/SavedRoutesContext";
 import API_BASE_URL from "./config";
+import { authHeaders } from "./components/Auth/api";
 
 function App() {
   const url = API_BASE_URL;
@@ -78,7 +79,7 @@ function App() {
     };
     const response = await fetch(`${url}/api/find-optimal-route`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: authHeaders(),
       body: JSON.stringify(payload),
     });
     const data = await response.json();

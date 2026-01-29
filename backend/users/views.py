@@ -3,22 +3,8 @@ from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect, csrf_exempt
-
-
-# @method_decorator(csrf_protect, name='dispatch')
-# class CheckAuthenticatedView(APIView):
-#     def get(self, request, format=None):
-#         try:
-#             isAuthenticated = User.is_authenticated
-
-#             if isAuthenticated:
-#                 return Response({ 'isAuthenticated': 'success' })
-#             return Response({ 'isAuthenticated': 'error' })
-#         except:
-#             return Response({ 'error': 'CheckAuthenticatedView went wrong...' })
+from django.contrib.auth import authenticate
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 class RegisterView(APIView):
@@ -41,8 +27,8 @@ class RegisterView(APIView):
 
             User.objects.create_user(username=u, password=p)
             return Response({"detail": "User created"}, status=201)
-        except:
-            return Response({ 'error': 'RegisterView went wrong...' })
+        except Exception as e:
+            return Response({'error': f'RegisterView error: {str(e)}'}, status=500)
 
 
 class LoginView(APIView):
@@ -52,39 +38,55 @@ class LoginView(APIView):
         data = request.data
 
         try:
-            user = authenticate(username=data.get("username"), password=data.get("password"))
+            user = authenticate(
+                username=data.get("username"), 
+                password=data.get("password")
+            )
             if user is None:
                 return Response({"error": "Invalid credentials"}, status=400)
 
-            login(request, user)
-            request.session.save()  # Explicitly save session for cross-origin cookies
-            return Response({"detail": "Logged in", "username": user.username})
+            # Generate JWT tokens
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                "access": str(refresh.access_token),
+                "refresh": str(refresh),
+                "username": user.username
+            })
         except Exception as e:
-            return Response({ 'error': f'LoginView error: {str(e)}' }, status=500)
+            return Response({'error': f'LoginView error: {str(e)}'}, status=500)
 
 
 class MeView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        return Response({ "username": request.user.username })
+        return Response({"username": request.user.username})
 
 
-@method_decorator(csrf_exempt, name='dispatch')
 class LogoutView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = (permissions.AllowAny,)
 
     def post(self, request, format=None):
-        logout(request)
+        # JWT is stateless - client just deletes tokens locally
         return Response({"detail": "Logged out"})
 
 
-@method_decorator(ensure_csrf_cookie, name='dispatch')
-class GetCSRFToken(APIView):
-    permission_classes = (permissions.AllowAny, )
+class RefreshTokenView(APIView):
+    permission_classes = (permissions.AllowAny,)
 
-    def get(self, request, format=None):
-        return Response({ 'detail': 'CSRF cookie set' })
+    def post(self, request, format=None):
+        """Refresh access token using refresh token"""
+        refresh_token = request.data.get("refresh")
+        if not refresh_token:
+            return Response({"error": "Refresh token required"}, status=400)
+        
+        try:
+            refresh = RefreshToken(refresh_token)
+            return Response({
+                "access": str(refresh.access_token),
+            })
+        except Exception as e:
+            return Response({"error": "Invalid refresh token"}, status=401)
 
 
 class DeleteAccountView(APIView):

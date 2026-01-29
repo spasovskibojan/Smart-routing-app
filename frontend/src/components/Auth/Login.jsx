@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./reglog.css";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "./AuthContext";
-import { login, me } from "./api";
+import { login } from "./api";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -15,24 +15,15 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await login(form.username, form.password);
-      console.log('Login response:', res.status, res.ok);
+      const result = await login(form.username, form.password);
 
-      if (res.ok) {
-        const userResponse = await me();
-        console.log('Me response:', userResponse.status, userResponse.ok);
-
-        if (userResponse.ok) {
-          const userData = await userResponse.json();
-          setUser(userData.username);
-          navigate("/");
-        } else {
-          console.error('Failed to get user data after login');
-          alert("Login failed: Could not verify session. Please try again.");
-        }
+      if (result.ok) {
+        // JWT login was successful - username is in the response
+        setUser(result.data.username);
+        navigate("/");
       } else {
-        const errorData = await res.json();
-        console.error('Login failed:', errorData);
+        // Login failed - get error message
+        const errorData = await result.json();
         alert(`Login failed: ${errorData.error || 'Invalid credentials'}`);
       }
     } catch (error) {

@@ -5,7 +5,7 @@ import {
   useEffect,
   useCallback,
 } from "react";
-import { me, fetchCSRF } from "./api";
+import { me, getAccessToken, clearTokens } from "./api";
 
 const AuthContext = createContext();
 
@@ -14,14 +14,29 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   const loadUser = useCallback(async () => {
-    await fetchCSRF();
-    const res = await me();
-    if (res.ok) {
-      const data = await res.json();
-      setUser(data.username);
+    // Check if we have a stored JWT token
+    const token = getAccessToken();
+
+    if (token) {
+      try {
+        const res = await me();
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.username);
+        } else {
+          // Token invalid or expired
+          clearTokens();
+          setUser(null);
+        }
+      } catch (error) {
+        console.error('Failed to load user:', error);
+        clearTokens();
+        setUser(null);
+      }
     } else {
       setUser(null);
     }
+
     setLoading(false);
   }, []);
 

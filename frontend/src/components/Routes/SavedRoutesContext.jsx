@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import API_BASE_URL from '../../config';
+import { authHeaders } from '../Auth/api';
 
 const SavedRoutesContext = createContext();
 
@@ -8,17 +9,12 @@ export function SavedRoutesProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-
-
   const fetchSavedRoutes = async () => {
     setLoading(true);
     setError(null);
     try {
       const response = await fetch(`${API_BASE_URL}/api/saved-routes/`, {
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: authHeaders(),
       });
 
       if (!response.ok) {
@@ -40,10 +36,7 @@ export function SavedRoutesProvider({ children }) {
     try {
       const response = await fetch(`${API_BASE_URL}/api/saved-routes/`, {
         method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: authHeaders(),
         body: JSON.stringify(routeData),
       });
 
@@ -69,10 +62,7 @@ export function SavedRoutesProvider({ children }) {
     try {
       const response = await fetch(`${API_BASE_URL}/api/saved-routes/${id}/`, {
         method: "PUT",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: authHeaders(),
         body: JSON.stringify(routeData),
       });
 
@@ -100,10 +90,7 @@ export function SavedRoutesProvider({ children }) {
     try {
       const response = await fetch(`${API_BASE_URL}/api/saved-routes/${id}/`, {
         method: "DELETE",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: authHeaders(),
       });
 
       if (!response.ok) {
