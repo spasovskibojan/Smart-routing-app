@@ -260,20 +260,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ---
 
-## 📝 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
----
-
-## 👤 Author
-
-**Bojan Spasovski**
-
-- GitHub: [@spasovskibojan](https://github.com/spasovskibojan)
-
----
-
 ## 🙏 Acknowledgments
 
 - [OpenStreetMap](https://www.openstreetmap.org/) for map data
