@@ -46,7 +46,7 @@ function Sidebar(props) {
       const response = await fetch(
         `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
           query
-        )}&key=7de233630b45491d8155cbcc370e4166&limit=3&no_annotations=1` // Napravi go apito vo env
+        )}&key=25a6f45a181c4414891cd3f8ef8b9dc3&limit=3&no_annotations=1` // Napravi go apito vo env
       );
       const data = await response.json();
 
