@@ -49,54 +49,49 @@ function Controls({
       <div className="btn-group w-100 mb-3" role="group">
         <button
           type="button"
-          className={`btn ${
-            routeType === "round_trip" ? "btn-primary" : "btn-outline-primary"
-          }`}
+          className={`btn ${routeType === "round_trip" ? "btn-primary" : "btn-outline-primary"
+            }`}
           onClick={() => setRouteType("round_trip")}
         >
-          Кружна тура
+          Round Trip
         </button>
         <button
           type="button"
-          className={`btn ${
-            routeType === "one_way" ? "btn-primary" : "btn-outline-primary"
-          }`}
+          className={`btn ${routeType === "one_way" ? "btn-primary" : "btn-outline-primary"
+            }`}
           onClick={() => setRouteType("one_way")}
         >
-          Еднонасочна рута
+          One-Way Route
         </button>
       </div>
 
       <div className="btn-group w-100 mb-3" role="group">
         <button
           type="button"
-          className={`btn ${
-            transportation === "driving-car"
+          className={`btn ${transportation === "driving-car"
               ? "btn-primary"
               : "btn-outline-primary"
-          }`}
+            }`}
           onClick={() => setTransportation("driving-car")}
         >
           <FontAwesomeIcon icon={faCar} />
         </button>
         <button
           type="button"
-          className={`btn ${
-            transportation === "cycling-regular"
+          className={`btn ${transportation === "cycling-regular"
               ? "btn-primary"
               : "btn-outline-primary"
-          }`}
+            }`}
           onClick={() => setTransportation("cycling-regular")}
         >
           <FontAwesomeIcon icon={faBicycle} />
         </button>
         <button
           type="button"
-          className={`btn ${
-            transportation === "foot-walking"
+          className={`btn ${transportation === "foot-walking"
               ? "btn-primary"
               : "btn-outline-primary"
-          }`}
+            }`}
           onClick={() => setTransportation("foot-walking")}
         >
           <FontAwesomeIcon icon={faPersonWalking} />
@@ -107,21 +102,21 @@ function Controls({
         onClick={handleOptimizeRoute}
         className="btn btn-success w-100 mb-2"
       >
-        Оптимизирај рута
+        Optimize Route
       </button>
-      
+
       <button
         onClick={() => setShowSaveModal(true)}
         className="btn btn-info w-100 mb-2"
         disabled={markers.length < 2}
-        title={markers.length < 2 ? "Треба најмалку 2 маркери за да зачувате рута" : "Зачувај рута"}
+        title={markers.length < 2 ? "At least 2 markers are required to save a route" : "Save Route"}
       >
         <FontAwesomeIcon icon={faSave} className="me-2" />
-        Зачувај рута
+        Save Route
       </button>
 
       <button onClick={handleClear} className="btn btn-danger w-100">
-        Исчисти ги сите маркери
+        Clear All Markers
       </button>
 
       <button
@@ -137,7 +132,7 @@ function Controls({
         onChange={handleFileChange}
         style={{ display: "none" }}
       />
-      
+
       <SaveRouteModal
         isOpen={showSaveModal}
         onClose={() => setShowSaveModal(false)}

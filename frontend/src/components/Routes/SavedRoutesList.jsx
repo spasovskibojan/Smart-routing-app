@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { useSavedRoutes } from "./SavedRoutesContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { 
-  faRoute, 
-  faTrash, 
-  faCar, 
-  faBicycle, 
+import {
+  faRoute,
+  faTrash,
+  faCar,
+  faBicycle,
   faPersonWalking,
   faMapMarkerAlt,
-  faCalendarAlt 
+  faCalendarAlt
 } from "@fortawesome/free-solid-svg-icons";
 
 function SavedRoutesList({ onLoadRoute }) {
@@ -16,7 +16,7 @@ function SavedRoutesList({ onLoadRoute }) {
   const [deletingId, setDeletingId] = useState(null);
 
   const handleDelete = async (id, name) => {
-    if (!window.confirm(`Дали сте сигурни дека сакате да ја избришете рутата "${name}"?`)) {
+    if (!window.confirm(`Are you sure you want to delete the route "${name}"?`)) {
       return;
     }
 
@@ -45,13 +45,13 @@ function SavedRoutesList({ onLoadRoute }) {
   const getTransportationLabel = (transportation) => {
     switch (transportation) {
       case "driving-car":
-        return "Автомобил";
+        return "Car";
       case "cycling-regular":
-        return "Велосипед";
+        return "Bicycle";
       case "foot-walking":
-        return "Пешачење";
+        return "Walking";
       default:
-        return "Автомобил";
+        return "Car";
     }
   };
 
@@ -72,7 +72,7 @@ function SavedRoutesList({ onLoadRoute }) {
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
-        <p className="text-muted mt-2 small">Се вчитуваат зачуваните рути...</p>
+        <p className="text-muted mt-2 small">Loading saved routes...</p>
       </div>
     );
   }
@@ -81,9 +81,9 @@ function SavedRoutesList({ onLoadRoute }) {
     return (
       <div className="text-center py-4">
         <FontAwesomeIcon icon={faRoute} size="2x" className="text-muted mb-3" />
-        <p className="text-muted">Немате зачувани рути.</p>
+        <p className="text-muted">You have no saved routes.</p>
         <p className="text-muted small">
-          Додадете маркери на мапата и кликнете "Зачувај рута".
+          Add markers on the map and click "Save Route".
         </p>
       </div>
     );
@@ -102,7 +102,7 @@ function SavedRoutesList({ onLoadRoute }) {
                 <button
                   className="btn btn-sm btn-outline-primary"
                   onClick={() => onLoadRoute(route)}
-                  title="Вчитај рута"
+                  title="Load route"
                 >
                   <FontAwesomeIcon icon={faRoute} size="sm" />
                 </button>
@@ -110,7 +110,7 @@ function SavedRoutesList({ onLoadRoute }) {
                   className="btn btn-sm btn-outline-danger"
                   onClick={() => handleDelete(route.id, route.name)}
                   disabled={deletingId === route.id}
-                  title="Избриши рута"
+                  title="Delete route"
                 >
                   {deletingId === route.id ? (
                     <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -120,11 +120,11 @@ function SavedRoutesList({ onLoadRoute }) {
                 </button>
               </div>
             </div>
-            
+
             <div className="d-flex align-items-center gap-3 text-muted small mb-2">
               <div className="d-flex align-items-center gap-1">
                 <FontAwesomeIcon icon={faMapMarkerAlt} />
-                <span>{route.markers_count} маркери</span>
+                <span>{route.markers_count} markers</span>
               </div>
               <div className="d-flex align-items-center gap-1">
                 <FontAwesomeIcon icon={getTransportationIcon(route.transportation)} />
@@ -134,7 +134,7 @@ function SavedRoutesList({ onLoadRoute }) {
 
             <div className="d-flex justify-content-between align-items-center">
               <span className="badge bg-light text-dark">
-                {route.route_type === "round_trip" ? "Кружна тура" : "Еднонасочна рута"}
+                {route.route_type === "round_trip" ? "Round Trip" : "One-Way Route"}
               </span>
               <div className="d-flex align-items-center gap-1 text-muted small">
                 <FontAwesomeIcon icon={faCalendarAlt} />

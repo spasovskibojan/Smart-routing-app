@@ -13,8 +13,8 @@ function formatTime(seconds) {
     hours > 0
       ? `${hours}h ${minutes}m`
       : minutes > 0
-      ? `${minutes}m ${seconds}s`
-      : `${seconds}s`;
+        ? `${minutes}m ${seconds}s`
+        : `${seconds}s`;
 
   return res;
 }
@@ -27,7 +27,7 @@ function DirectionsList({
   onShowMore,
 }) {
   if (routeSteps.length === 0) {
-    return <p className="text-muted">Насоките ќе се појават тука.</p>;
+    return <p className="text-muted">Directions will appear here.</p>;
   }
 
   return (
@@ -36,9 +36,8 @@ function DirectionsList({
         {routeSteps.slice(0, visibleSteps).map((step, index) => (
           <li
             key={index}
-            className={`list-group-item list-group-item-action ${
-              index === activeIndex ? "active" : ""
-            }`}
+            className={`list-group-item list-group-item-action ${index === activeIndex ? "active" : ""
+              }`}
             style={{ cursor: "pointer" }}
             onClick={() => onStepClick(step, index)}
           >
@@ -47,11 +46,11 @@ function DirectionsList({
               <div className="text-muted fst-italic">"{step.name}"</div>
             )}
             <small className="text-muted">
-              Растојание: {(step.distance / 1000).toFixed(2)} km
+              Distance: {(step.distance / 1000).toFixed(2)} km
             </small>
             <br />
             <small className="text-muted">
-              Време: {formatTime(step.duration)}
+              Time: {formatTime(step.duration)}
             </small>
           </li>
         ))}
@@ -62,7 +61,7 @@ function DirectionsList({
             className="btn btn-outline-primary btn-sm"
             onClick={onShowMore}
           >
-            Прикажи повеќе ({routeSteps.length - visibleSteps} останати)
+            Show more ({routeSteps.length - visibleSteps} remaining)
           </button>
         </div>
       )}

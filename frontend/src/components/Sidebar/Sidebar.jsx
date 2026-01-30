@@ -317,7 +317,7 @@ function Sidebar(props) {
 
         <h2 className="text-center mb-3">Smart Routing App</h2>
         <p className="text-center text-muted small mb-3">
-          Кликнете на мапата за да додадете локации (маркери).
+          Click on the map to add locations (markers).
         </p>
 
         <Controls
@@ -332,12 +332,12 @@ function Sidebar(props) {
         />
 
         <div className="mt-4">
-          <h5>Зачувани рути:</h5>
+          <h5>Saved Routes:</h5>
           <SavedRoutesList onLoadRoute={handleLoadRoute} />
         </div>
 
         <div className="mt-4">
-          <h5>Додадени локации:</h5>
+          <h5>Added Locations:</h5>
           <MarkersList
             markers={props.markers}
             onDeleteMarker={props.handleDeleteMarker}
@@ -345,7 +345,7 @@ function Sidebar(props) {
         </div>
 
         <div className="mt-3 flex-grow-1">
-          <h5>Насоки:</h5>
+          <h5>Directions:</h5>
           <DirectionsList
             routeSteps={props.routeSteps}
             visibleSteps={props.visibleSteps}

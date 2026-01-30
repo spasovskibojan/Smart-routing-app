@@ -39,7 +39,7 @@ function SaveRouteModal({ isOpen, onClose, markers, routeType, transportation })
       <div className="modal-dialog modal-dialog-centered">
         <div className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title">Зачувај рута</h5>
+            <h5 className="modal-title">Save Route</h5>
             <button
               type="button"
               className="btn-close"
@@ -56,7 +56,7 @@ function SaveRouteModal({ isOpen, onClose, markers, routeType, transportation })
               )}
               <div className="mb-3">
                 <label htmlFor="routeName" className="form-label">
-                  Име на рута *
+                  Route Name *
                 </label>
                 <input
                   type="text"
@@ -64,17 +64,17 @@ function SaveRouteModal({ isOpen, onClose, markers, routeType, transportation })
                   id="routeName"
                   value={routeName}
                   onChange={(e) => setRouteName(e.target.value)}
-                  placeholder="Внесете име за рутата..."
+                  placeholder="Enter route name..."
                   maxLength={255}
                   required
                 />
               </div>
               <div className="mb-3">
                 <small className="text-muted">
-                  Ова ќе зачува {markers.length} маркери, {" "}
-                  {routeType === "round_trip" ? "кружна тура" : "еднонасочна рута"} за{" "}
-                  {transportation === "driving-car" ? "автомобил" : 
-                   transportation === "cycling-regular" ? "велосипед" : "пешачење"}.
+                  This will save {markers.length} markers, {" "}
+                  {routeType === "round_trip" ? "round trip" : "one-way route"} for{" "}
+                  {transportation === "driving-car" ? "car" :
+                    transportation === "cycling-regular" ? "bicycle" : "walking"}.
                 </small>
               </div>
             </div>
@@ -85,7 +85,7 @@ function SaveRouteModal({ isOpen, onClose, markers, routeType, transportation })
                 onClick={handleClose}
                 disabled={isSubmitting}
               >
-                Откажи
+                Cancel
               </button>
               <button
                 type="submit"
@@ -95,10 +95,10 @@ function SaveRouteModal({ isOpen, onClose, markers, routeType, transportation })
                 {isSubmitting ? (
                   <>
                     <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    Зачувува...
+                    Saving...
                   </>
                 ) : (
-                  "Зачувај рута"
+                  "Save Route"
                 )}
               </button>
             </div>

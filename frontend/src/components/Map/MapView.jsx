@@ -44,7 +44,7 @@ function MapView({
 
         {markers.map((position, index) => (
           <Marker key={`marker-${index}`} position={position}>
-            <Popup>Маркер {index + 1}</Popup>
+            <Popup>Marker {index + 1}</Popup>
           </Marker>
         ))}
 
